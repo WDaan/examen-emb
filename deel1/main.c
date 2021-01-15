@@ -7,7 +7,7 @@
 
 void timer_func(char *filename, int interval)
 {
-  printf("Starting timer...");
+  printf("Starting timer...\n");
   while (1)
   {
     //open file
@@ -21,7 +21,7 @@ void timer_func(char *filename, int interval)
     char text[50];
     sprintf(text, "%s\n", buff);
 
-    printf("%s\n", text);
+    printf("%s", text);
 
     //write & close file
     write(fdes, text, strlen(text));
