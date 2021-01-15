@@ -4,4 +4,4 @@
 !*/*.c
 !*/*.h
 !*/Makefile
-*/*.txt
+!*/*.txt
