@@ -13,29 +13,39 @@ struct LogOptions
   char filename[40];
 };
 
+pthread_mutex_t lock;
+
 void *timer_func(void *options)
 {
   struct LogOptions *my_option = (struct LogOptions *)options;
   printf("Starting timer... file:%s - time:%d\n", my_option->filename, my_option->interval);
   while (1)
   {
+    pthread_mutex_lock(&lock);
     //open file
-    int fdes = open(my_option->filename, O_CREAT | O_APPEND | O_WRONLY);
+    FILE *fp = fopen(my_option->filename, "aw");
 
-    //get time & format
-    char buff[24];
-    time_t now = time(0);
-    struct tm *t = localtime(&now);
-    strftime(buff, 24, "%Y-%m-%d %H:%M:%S", t);
-    char text[50];
-    sprintf(text, "%s\n", buff);
-    printf("%s - %s", my_option->filename, text);
+    if (fp == NULL)
+    {
+      perror("Error: File open failure.");
+    }
+    else
+    {
+      //get time & format
+      char buff[24];
+      time_t now = time(0);
+      struct tm *t = localtime(&now);
+      strftime(buff, 24, "%Y-%m-%d %H:%M:%S", t);
+      char text[50];
+      sprintf(text, "%s\n", buff);
+      printf("%s - %s", my_option->filename, text);
 
-    //write & close file
-    write(fdes, text, strlen(text));
-    close(fdes);
-
-    sleep(my_option->interval);
+      //write & close file
+      fwrite(text, strlen(text), 1, fp);
+      fclose(fp);
+      pthread_mutex_unlock(&lock);
+      sleep(my_option->interval);
+    }
   }
   return NULL;
 }
@@ -63,6 +73,9 @@ int main(int argc, char **argv)
 
       pthread_join(thread_1, NULL);
       pthread_join(thread_2, NULL);
+
+      pthread_mutex_destroy(&lock);
+
       printf("After Threads\n");
     }
     else
