@@ -1,0 +1,7 @@
+#ingore all compiled files
+*/* 
+#keep al .c &.h  files
+!*/*.c
+!*/*.h
+!*/Makefile
+!*/*.txt
